@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Grid, Button, Typography, Container, CardActionArea } from "@material-ui/core";
+import { Grid, Button, Typography, Container, CardActionArea, IconButton } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import { Link } from "react-router-dom";
+import { BiLastPage, BiFirstPage } from 'react-icons/bi'
 
 const useStyles = makeStyles({
 
@@ -31,6 +32,7 @@ const useStyles = makeStyles({
                     },
                     tag: {
                       float: "right",
+
                     }
     });
 
@@ -69,9 +71,6 @@ function Selaa(props) {
       setMaara1(parseInt(check2));}
     }, []);
 
-    //näytä tai älä näytä navigointipainikkeita
-    const [showLast, setShowLast] = useState(false);
-    const [showNext, setShowNext] = useState(true);
 
     //slicellä määrä muuttujien perusteella otetaan 20 kerrallaan
     let listaus = data.postimerkit.slice(maara1,maara);
@@ -80,53 +79,76 @@ function Selaa(props) {
     useEffect(() => { 
       localStorage.setItem("maara1", maara);
       localStorage.setItem("maara11", maara1);
-
-    if(maara == 20){
-      setShowLast(false);
-    }
-    if(maara == 2320){
-      setShowNext(false);
-    }
   }, [maara, maara1]);
 
   //lisätään tai vähennettään listauksesta
   function edelliset(){
-    setShowNext(true);
     setMaara(maara-20);
     setMaara1(maara1-20);
   }
   function seuraavat(){
-    setShowLast(true);
     setMaara(maara+20);
     setMaara1(maara1+20);
+  }
+
+  const firstPage = () => {
+    setMaara1(0);
+    setMaara(20);
+  }
+
+  const lastPage = () => {
+    setMaara1(2300);
+    setMaara(2320);
   }
 
   return (
     <Container style={{
                         paddingTop : "10px",
                      }}>
-
-      {(showLast)
-      ? <Button
-      variant="contained"
-      color="secondary"
-      onClick={() => { edelliset() }}
-      >
-      Näytä edelliset 20 merkkiä
-      </Button>  
-      : ""
-      }
-      {(showNext)  
-      ?<Button
-        className={tyylit.tag}
+      <Grid container spacing={2} columns={12} style={{textAlign:'center'}}>
+        <Grid item xs={6}>
+        {(maara1>19)
+        ?<> 
+        <IconButton
         variant="contained"
         color="secondary"
-        onClick={() => { seuraavat() }}
-      >
-        Näytä seuraavat 20 merkkiä
-      </Button>
-      : ""
-      } 
+        onClick={() => { firstPage() }}
+        >
+          <BiFirstPage/>
+        </IconButton>
+        <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => { edelliset() }}
+        >
+        Näytä edelliset 20 merkkiä
+        </Button>
+        </>  
+        : ""
+        }
+        </Grid>
+        <Grid item xs={6}>
+        {(maara<2320) 
+        ?<> 
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => { seuraavat() }}
+        >
+          Näytä seuraavat 20 merkkiä
+        </Button>
+        <IconButton
+        variant="contained"
+        color="secondary"
+        onClick={() => { lastPage() }}
+        >
+          <BiLastPage/>
+        </IconButton>
+        </>
+        : ""
+        }
+        </Grid>
+      </Grid>
       <Grid container spacing={24}>
         {listaus.map((lista) => {
         return (
